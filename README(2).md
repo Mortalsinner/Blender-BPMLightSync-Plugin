@@ -1,0 +1,288 @@
+# Audio BPM Light Sync
+
+A lightweight Blender add-on for creating **audio-reactive light
+animations** and **BPM-synchronized lighting** directly inside Blender.
+
+The add-on analyzes WAV audio without external Python packages and
+converts audio energy into animated light intensity. It also includes
+frequency-biased responses for individual instrument-like elements such
+as kick, snare, hi-hat, guitar, bass, piano, and synth.
+
+> **Blender version:** 3.2+\
+> **Audio format:** WAV\
+> **Dependencies:** None --- uses Blender's built-in Python standard
+> library
+
+## Features
+
+### Audio Reactive Modes
+
+Choose how your lights respond to the audio:
+
+-   **Volume** --- reacts to overall audio energy
+-   **Beat** --- reacts to detected beat transients
+-   **Hybrid** --- combines volume and beat response
+
+### Instrument Response
+
+The add-on also provides frequency-biased responses for:
+
+  Category    Response
+  ----------- ------------------
+  🥁 Drums    Kick / Bass Drum
+  🥁 Drums    Snare
+  🥁 Drums    Hi-Hat
+  🥁 Drums    Toms
+  🥁 Drums    Cymbals
+  🎸 Guitar   Rhythm
+  🎸 Guitar   Melody
+  🎸          Bass Guitar
+  🎹          Keyboard / Piano
+  🎛️          Synth (Optional)
+
+These responses are based on representative frequency ranges rather than
+true instrument/source separation. They are intended to provide useful
+visual reactions from a mixed audio track while keeping the add-on
+lightweight and dependency-free.
+
+## How It Works
+
+The analyzer:
+
+1.  Loads a WAV file.
+2.  Converts multi-channel audio to mono.
+3.  Resamples the audio to 16 kHz for analysis.
+4.  Calculates overall RMS audio energy.
+5.  Detects beat peaks using adaptive energy thresholds.
+6.  Uses lightweight Goertzel frequency analysis to estimate energy
+    around representative frequencies.
+7.  Normalizes and smooths each response curve.
+8.  Generates Blender keyframes on the selected lights.
+
+The instrument responses are frequency-biased approximations, not
+AI-based source separation.
+
+## Installation
+
+1.  Download the `.py` file from this repository.
+2.  Open **Blender**.
+3.  Go to **Edit → Preferences → Add-ons**.
+4.  Click **Install...**
+5.  Select the `audio_bpm_light_sync_instrument_response.py` file.
+6.  Enable the add-on.
+7.  Open the 3D Viewport sidebar with **N**.
+8.  Find the **Audio Light** tab.
+
+## Basic Workflow
+
+### 1. Prepare your lights
+
+Create or select the lights you want to animate.
+
+You can also use:
+
+**Quick Setup → Create Light Rig**
+
+This creates a simple three-light visualizer setup.
+
+### 2. Select your WAV
+
+In the **Audio Input** section:
+
+**Select WAV → choose your audio file**
+
+Currently, WAV is supported directly. Convert MP3, M4A, or other formats
+to WAV before analysis.
+
+### 3. Analyze the audio
+
+Click:
+
+**Analyze Audio**
+
+The add-on will calculate:
+
+-   Audio energy
+-   Beat events
+-   Estimated BPM
+-   Frequency response curves
+
+### 4. Choose a response
+
+Under **Audio Response**, choose one of the available modes.
+
+For example:
+
+-   **Drums • Kick / Bass Drum** for strong low-end flashes
+-   **Drums • Hi-Hat** for rapid high-frequency reactions
+-   **Guitar • Rhythm** for lower/mid guitar energy
+-   **Guitar • Melody** for higher melodic content
+-   **Bass Guitar** for low-frequency bass movement
+-   **Keyboard / Piano** for broad piano frequency activity
+-   **Synth (Optional)** for synth-like mid/high frequency activity
+
+### 5. Adjust the reaction
+
+Useful controls include:
+
+-   **Audio Gain** --- increases or decreases the analyzed response
+-   **Smoothing** --- softens rapid changes
+-   **Beat Threshold** --- controls beat detection sensitivity
+-   **Base Energy** --- minimum light intensity
+-   **Flash Energy** --- maximum light intensity
+-   **Reaction Strength** --- overall response multiplier
+
+### 6. Generate animation
+
+Select:
+
+**GENERATE FROM AUDIO**
+
+The add-on will create keyframes for the selected lights.
+
+## BPM Mode
+
+The add-on also includes deterministic BPM animation.
+
+Set:
+
+-   BPM
+-   Beat Division
+-   Start Frame
+-   End Frame
+-   Base Energy
+-   Flash Energy
+
+Beat divisions include:
+
+-   1/1
+-   1/2
+-   1/4
+-   1/8
+-   1/16
+
+Then click:
+
+**Generate BPM**
+
+This is useful when you want predictable rhythmic lighting rather than
+audio-derived instrument responses.
+
+## Staggered Lights
+
+Enable **Stagger Lights** to offset the response between multiple
+lights.
+
+This can make a group of lights feel less mechanically synchronized.
+
+Use **Stagger Frames** to control the offset.
+
+## Color Shift
+
+Enable **Color Shift** to make lights change hue during detected beat
+events.
+
+The **Hue Step** control determines how quickly the color cycles.
+
+## Clearing Generated Animation
+
+The add-on only targets animation curves belonging to the **Audio Light
+Sync** action group.
+
+Use:
+
+**Clear Generated Animation**
+
+to remove animation generated by the add-on without intentionally
+removing unrelated animation.
+
+## Performance
+
+The analyzer is designed to work without NumPy or SciPy.
+
+It uses:
+
+-   Python standard library WAV handling
+-   RMS energy analysis
+-   Zero-crossing analysis
+-   Goertzel frequency estimation
+-   Moving-average smoothing
+
+Frequency analysis checks a limited number of representative frequencies
+per frame to keep Blender responsive.
+
+For very long audio files, analysis is capped at 12,000 frames.
+
+## Important Limitations
+
+### Not true stem separation
+
+A mixed song contains overlapping frequencies. A guitar, piano, snare,
+and vocal can occupy many of the same frequency ranges.
+
+Therefore:
+
+> **Kick ≠ guaranteed kick-only detection**\
+> **Guitar ≠ guaranteed guitar-only detection**
+
+The instrument modes should be understood as **frequency-biased visual
+responses**, not isolated stems.
+
+For the cleanest results, use separated stems or tracks with relatively
+clear instrumentation.
+
+### WAV only
+
+The current analyzer expects `.wav` audio files.
+
+Convert other formats before importing them.
+
+### Mono analysis
+
+Stereo audio is converted to mono for analysis. This means the response
+does not currently distinguish left/right instrument placement.
+
+## Recommended Uses
+
+This add-on is particularly useful for:
+
+-   Music visualizers
+-   Concert / stage lighting previews
+-   VJ-style animations
+-   Abstract motion graphics
+-   Audio-reactive 3D scenes
+-   Music videos
+-   Blender renders
+-   LED wall previsualization
+-   Generative lighting experiments
+
+## Example Response Mapping
+
+A simple visualizer could use different lights for different parts of
+the mix:
+
+``` text
+Kick       → Main light flash
+Snare      → Secondary light pulse
+Hi-Hat     → Small rapid lights
+Toms       → Side lights
+Cymbals    → Wide/high lights
+Bass       → Large low-frequency light
+Guitar     → Color/intensity movement
+Piano      → Soft fill lights
+Synth      → Background / accent lights
+```
+
+Because each light can be animated independently, you can create layered
+reactions instead of making every light respond to the full mix.
+
+## License
+
+Choose a license appropriate for your repository before publishing. MIT
+is a simple option if you want others to freely use, modify, and
+redistribute the add-on.
+
+## Credits
+
+Created as a lightweight, dependency-free Blender audio-reactive
+lighting tool.
